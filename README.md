@@ -1,1 +1,3 @@
-# praktikum_new_diplom
+https://yapracticum.hopto.org/admin
+Email: onovikova@mail.ru
+Password: 0000
