@@ -6,6 +6,7 @@ class IngredientInRecipeInline(admin.TabularInline):
     model = Recipe.ingredients.through
     extra = 1
 
+
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
     list_display = ('name', 'color', 'slug')

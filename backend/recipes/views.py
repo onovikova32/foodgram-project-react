@@ -8,10 +8,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import RecipeFilter
-from .models import ShoppingCart, Ingredient, IngredientInRecipe, Tag, Recipe, Favorite
+from .models import ShoppingCart, Ingredient, IngredientInRecipe,\
+    Tag, Recipe, Favorite
 from .permissions import PublicAccess
 from .serializers import RecipeSerializer, RecipeListSerializer, \
-    TagSerializer, IngredientSerializer, FavoriteSerializer, ShoppingCartSerializer
+    TagSerializer, IngredientSerializer, FavoriteSerializer,\
+    ShoppingCartSerializer
 
 
 class RecipeListPagination(PageNumberPagination):
@@ -64,7 +66,8 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         try:
             favor = Favorite.objects.get(user=user, favorite=favorite)
         except Favorite.DoesNotExist:
-            return Response({'detail': 'The favorite object does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'The favorite object does not exist.'},
+                            status=status.HTTP_404_NOT_FOUND)
         favor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -86,7 +89,8 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
         try:
             recipe_in_cart = ShoppingCart.objects.get(user=user, recipe=recipe)
         except Favorite.DoesNotExist:
-            return Response({'detail': 'The ShoppingCart object does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'The ShoppingCart object does not exist.'},
+                            status=status.HTTP_404_NOT_FOUND)
         recipe_in_cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -100,14 +104,16 @@ class DownloadShoppingCartView(APIView):
 
         for cart_item in recipes_in_shopping_cart:
             recipe = cart_item.recipe
-            ingredients_in_recipe = IngredientInRecipe.objects.filter(recipe=recipe)
+            ingredients_in_recipe =\
+                IngredientInRecipe.objects.filter(recipe=recipe)
 
             for ingredient_in_recipe in ingredients_in_recipe:
                 ingredient = ingredient_in_recipe.ingredient
                 amount = ingredient_in_recipe.amount
                 measurement_unit = ingredient.measurement_unit
 
-                ingredient_line = f"{ingredient.name} ({amount} {measurement_unit})"
+                ingredient_line = f"{ingredient.name} ({amount} " \
+                                  f"{measurement_unit})"
 
                 ingredients_summary[ingredient_line] += float(amount)
 
@@ -119,6 +125,7 @@ class DownloadShoppingCartView(APIView):
 
         with open('shopping_cart.txt', 'rb') as txt_file:
             response = HttpResponse(txt_file.read(), content_type='text/plain')
-            response['Content-Disposition'] = 'attachment; filename="shopping_cart.txt"'
+            response['Content-Disposition'] = 'attachment; ' \
+                                              'filename="shopping_cart.txt"'
 
         return response

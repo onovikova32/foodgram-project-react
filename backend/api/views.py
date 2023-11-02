@@ -1,5 +1,5 @@
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import AllowAny
 
 from .serializers import IngredientSerializer, TagSerializer
 from recipes.models import Ingredient, Tag

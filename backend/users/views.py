@@ -67,6 +67,7 @@ class FollowViewSet(viewsets.ModelViewSet):
         try:
             follow = Follow.objects.get(user=user, following=following)
         except Follow.DoesNotExist:
-            return Response({'detail': 'The follow object does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'The follow object does not exist.'},
+                            status=status.HTTP_404_NOT_FOUND)
         follow.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

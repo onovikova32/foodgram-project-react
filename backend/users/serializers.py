@@ -18,7 +18,8 @@ class CustomUserSerializer(UserCreateSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'is_subscribed')
+        fields = ('id', 'email', 'username', 'first_name',
+                  'last_name', 'is_subscribed')
 
     def get_is_subscribed(self, obj):
         follow = self.context['request'].user
@@ -32,11 +33,13 @@ class FollowListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'is_subscribed', 'recipes', 'recipes_count')
+        fields = ('id', 'email', 'username', 'first_name', 'last_name',
+                  'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes(self, obj):
         recipes = Recipe.objects.filter(author=obj)
-        recipes_limit = int(self.context['request'].query_params.get('recipes_limit', 10))
+        recipes_limit = int(self.context['request'].query_params.get(
+            'recipes_limit', 10))
         recipes = recipes[:recipes_limit]
         serialized_recipes = FollowRecipeSerializer(recipes, many=True).data
 
@@ -71,4 +74,5 @@ class FollowSerializer(serializers.ModelSerializer):
         return data
 
     def to_representation(self, instance):
-        return FollowListSerializer(instance.following, context=self.context).data
+        return FollowListSerializer(instance.following,
+                                    context=self.context).data
