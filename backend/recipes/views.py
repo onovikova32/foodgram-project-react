@@ -8,11 +8,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import RecipeFilter
-from .models import ShoppingCart, Ingredient, IngredientInRecipe,\
+from .models import ShoppingCart, Ingredient, IngredientInRecipe, \
     Tag, Recipe, Favorite
 from .permissions import PublicAccess
 from .serializers import RecipeSerializer, RecipeListSerializer, \
-    TagSerializer, IngredientSerializer, FavoriteSerializer,\
+    TagSerializer, IngredientSerializer, FavoriteSerializer, \
     ShoppingCartSerializer
 
 
@@ -89,8 +89,9 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
         try:
             recipe_in_cart = ShoppingCart.objects.get(user=user, recipe=recipe)
         except Favorite.DoesNotExist:
-            return Response({'detail': 'The ShoppingCart object does not exist.'},
-                            status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'detail': 'The ShoppingCart object does not exist.'},
+                status=status.HTTP_404_NOT_FOUND)
         recipe_in_cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -104,7 +105,7 @@ class DownloadShoppingCartView(APIView):
 
         for cart_item in recipes_in_shopping_cart:
             recipe = cart_item.recipe
-            ingredients_in_recipe =\
+            ingredients_in_recipe = \
                 IngredientInRecipe.objects.filter(recipe=recipe)
 
             for ingredient_in_recipe in ingredients_in_recipe:
