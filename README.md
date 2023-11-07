@@ -13,20 +13,15 @@ Foodgram - это сайт, на котором пользователи буд�
 ```bash
 git clone https://github.com/ваш-проект.git
 Перейдите в каталог проекта:
-bash
-Copy code
 cd ваш-проект
+
 Установите зависимости:
-bash
-Copy code
 pip install -r requirements.txt
+
 Запустите миграции:
-bash
-Copy code
 python manage.py migrate
+
 Запустите сервер разработки:
-bash
-Copy code
 python manage.py runserver
 
 
