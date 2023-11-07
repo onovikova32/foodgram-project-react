@@ -5,6 +5,7 @@ from .models import Recipe, Ingredient, Tag, Favorite
 class IngredientInRecipeInline(admin.TabularInline):
     model = Recipe.ingredients.through
     extra = 1
+    min_num = 1
 
 
 @admin.register(Tag)

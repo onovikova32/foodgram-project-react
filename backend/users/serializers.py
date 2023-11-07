@@ -22,8 +22,8 @@ class CustomUserSerializer(UserCreateSerializer):
                   'last_name', 'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        follow = self.context['request'].user
-        return Follow.objects.filter(user=follow, following=obj).exists()
+        user = self.context['request'].user
+        return user.follow.filter(following=obj).exists()
 
 
 class FollowListSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class FollowListSerializer(serializers.ModelSerializer):
                   'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes(self, obj):
-        recipes = Recipe.objects.filter(author=obj)
+        recipes = obj.recipes.all()
         recipes_limit = int(self.context['request'].query_params.get(
             'recipes_limit', 10))
         recipes = recipes[:recipes_limit]
@@ -46,8 +46,8 @@ class FollowListSerializer(serializers.ModelSerializer):
         return serialized_recipes
 
     def get_is_subscribed(self, obj):
-        follow = self.context['request'].user
-        return Follow.objects.filter(user=follow, following=obj).exists()
+        user = self.context['request'].user
+        return user.follow.filter(following=obj).exists()
 
 
 class FollowSerializer(serializers.ModelSerializer):
@@ -58,17 +58,15 @@ class FollowSerializer(serializers.ModelSerializer):
         read_only_fields = ('user', 'following')
 
     def validate(self, data):
-        follow = self.context['request'].user
+        user = self.context['request'].user
         match = resolve(self.context['request'].path_info)
         user_id = match.kwargs.get('user_id')
-        print(user_id)
         following = get_object_or_404(CustomUser, id=user_id)
-        if follow == following:
+        if user == following:
             raise serializers.ValidationError(
                 'Нельзя подписаться на самого себя')
 
-        if Follow.objects.filter(
-                user=follow, following=following).exists():
+        if user.follow.filter(following=following).exists():
             raise serializers.ValidationError(
                 'Вы уже подписаны на данного автора')
         return data

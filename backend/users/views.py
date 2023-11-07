@@ -38,12 +38,10 @@ class FollowListViewSet(generics.ListAPIView):
     permission_classes = (IsAuthenticated,)
     pagination_class = FollowListPagination
 
-    # filter_backends = [filters.SearchFilter]
-    # search_fields = ('following__username', 'user__username')
-
     def get_queryset(self):
-        queryset = CustomUser.objects.filter(following__user=self.request.user)
-        return queryset
+        user = self.request.user
+        follows = user.follow.all()
+        return [follow.following for follow in follows]
 
     def perform_create(self, serializer):
         user = self.request.user
@@ -65,7 +63,7 @@ class FollowViewSet(viewsets.ModelViewSet):
         following = get_object_or_404(CustomUser, id=int(user_id))
         user = self.request.user
         try:
-            follow = Follow.objects.get(user=user, following=following)
+            follow = get_object_or_404(Follow, user=user, following=following)
         except Follow.DoesNotExist:
             return Response({'detail': 'The follow object does not exist.'},
                             status=status.HTTP_404_NOT_FOUND)

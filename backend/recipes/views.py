@@ -1,4 +1,5 @@
 from collections import defaultdict
+
 from django_filters import rest_framework as filters
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -8,12 +9,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import RecipeFilter
-from .models import ShoppingCart, Ingredient, IngredientInRecipe, \
-    Tag, Recipe, Favorite
+from .models import (ShoppingCart, Ingredient, IngredientInRecipe,
+                     Tag, Recipe, Favorite)
 from .permissions import PublicAccess
-from .serializers import RecipeSerializer, RecipeListSerializer, \
-    TagSerializer, IngredientSerializer, FavoriteSerializer, \
-    ShoppingCartSerializer
+from .serializers import (RecipeSerializer, RecipeListSerializer,
+                          TagSerializer, IngredientSerializer,
+                          FavoriteSerializer, ShoppingCartSerializer)
 
 
 class RecipeListPagination(PageNumberPagination):
@@ -64,7 +65,7 @@ class FavoriteViewSet(viewsets.ModelViewSet):
         favorite = get_object_or_404(Recipe, id=int(recipe_id))
         user = self.request.user
         try:
-            favor = Favorite.objects.get(user=user, favorite=favorite)
+            favor = get_object_or_404(Favorite, user=user, favorite=favorite)
         except Favorite.DoesNotExist:
             return Response({'detail': 'The favorite object does not exist.'},
                             status=status.HTTP_404_NOT_FOUND)
@@ -87,7 +88,7 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=int(recipe_id))
         user = self.request.user
         try:
-            recipe_in_cart = ShoppingCart.objects.get(user=user, recipe=recipe)
+            recipe_in_cart = get_object_or_404(ShoppingCart, user=user, recipe=recipe)
         except Favorite.DoesNotExist:
             return Response(
                 {'detail': 'The ShoppingCart object does not exist.'},
@@ -99,34 +100,31 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
 class DownloadShoppingCartView(APIView):
     def get(self, request):
         user = self.request.user
-        recipes_in_shopping_cart = ShoppingCart.objects.filter(user=user)
+        recipes_in_shopping_cart = user.shopping_cart.all()
 
         ingredients_summary = defaultdict(float)
 
         for cart_item in recipes_in_shopping_cart:
             recipe = cart_item.recipe
-            ingredients_in_recipe = \
-                IngredientInRecipe.objects.filter(recipe=recipe)
+            ingredients_in_recipe = recipe.ingredientinrecipe_set.all()
 
             for ingredient_in_recipe in ingredients_in_recipe:
                 ingredient = ingredient_in_recipe.ingredient
                 amount = ingredient_in_recipe.amount
                 measurement_unit = ingredient.measurement_unit
 
-                ingredient_line = f"{ingredient.name} ({amount} " \
-                                  f"{measurement_unit})"
+                ingredient_line = (f"{ingredient.name} ({amount} "
+                                   f"{measurement_unit})")
 
                 ingredients_summary[ingredient_line] += float(amount)
 
-        with open('shopping_cart.txt', 'w', encoding='utf-8') as txt_file:
-            txt_file.write("Список покупок:\n\n")
+        content = "Список покупок:\n\n"
 
-            for ingredient_line, amount in ingredients_summary.items():
-                txt_file.write(f"{ingredient_line} — {amount} г\n")
+        for ingredient_line, amount in ingredients_summary.items():
+            content += f"{ingredient_line} — {amount} г\n"
 
-        with open('shopping_cart.txt', 'rb') as txt_file:
-            response = HttpResponse(txt_file.read(), content_type='text/plain')
-            response['Content-Disposition'] = 'attachment; ' \
-                                              'filename="shopping_cart.txt"'
+        response = HttpResponse(content, content_type='text/plain')
+        response['Content-Disposition'] = ('attachment; '
+                                           'filename="shopping_cart.txt"')
 
         return response
