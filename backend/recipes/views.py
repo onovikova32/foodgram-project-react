@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .filters import RecipeFilter
-from .models import (ShoppingCart, Ingredient, IngredientInRecipe,
+from .models import (ShoppingCart, Ingredient,
                      Tag, Recipe, Favorite)
 from .permissions import PublicAccess
 from .serializers import (RecipeSerializer, RecipeListSerializer,
@@ -88,7 +88,8 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, id=int(recipe_id))
         user = self.request.user
         try:
-            recipe_in_cart = get_object_or_404(ShoppingCart, user=user, recipe=recipe)
+            recipe_in_cart = get_object_or_404(ShoppingCart, user=user,
+                                               recipe=recipe)
         except Favorite.DoesNotExist:
             return Response(
                 {'detail': 'The ShoppingCart object does not exist.'},

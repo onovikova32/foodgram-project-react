@@ -57,9 +57,11 @@ class Recipe(models.Model):
         verbose_name='Время приготовления',
         validators=[
             MinValueValidator(MIN_COOKING_TIME,
-                              message=f'Минимальное время - {MIN_COOKING_TIME}'),
+                              message=f'Минимальное время - '
+                                      f'{MIN_COOKING_TIME}'),
             MaxValueValidator(MAX_COOKING_TIME,
-                              message=f'Максимальное время - {MAX_COOKING_TIME}')
+                              message=f'Максимальное время - '
+                                      f'{MAX_COOKING_TIME}')
         ]
     )
     ingredients = models.ManyToManyField(Ingredient,
