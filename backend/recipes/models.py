@@ -3,6 +3,10 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 User = get_user_model()
+MAX_COOKING_TIME = 32000
+MIN_COOKING_TIME = 1
+MAX_AMOUNT = 32000
+MIN_AMOUNT = 1
 
 
 class Ingredient(models.Model):
@@ -36,9 +40,6 @@ class Tag(models.Model):
 
 
 class Recipe(models.Model):
-    MAX_COOKING_TIME = 32000
-    MIN_COOKING_TIME = 1
-
     pub_date = models.DateTimeField(auto_now_add=True,
                                     verbose_name='Дата публикации')
     author = models.ForeignKey(
@@ -80,9 +81,6 @@ class Recipe(models.Model):
 
 
 class IngredientInRecipe(models.Model):
-    MAX_AMOUNT = 32000
-    MIN_AMOUNT = 1
-
     ingredient = models.ForeignKey(Ingredient,
                                    on_delete=models.CASCADE,
                                    verbose_name='Ингредиент')
@@ -105,8 +103,8 @@ class IngredientInRecipe(models.Model):
         verbose_name_plural = 'Ингредиентов в рецепте'
 
     def __str__(self):
-        return f"{self.ingredient.name} ({self.amount} " \
-               f"{self.ingredient.measurement_unit}) in {self.recipe.name}"
+        return f'{self.ingredient.name} ({self.amount} ' \
+               f'{self.ingredient.measurement_unit}) in {self.recipe.name}'
 
 
 class Favorite(models.Model):

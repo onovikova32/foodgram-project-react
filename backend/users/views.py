@@ -62,10 +62,6 @@ class FollowViewSet(viewsets.ModelViewSet):
     def destroy(self, request, user_id):
         following = get_object_or_404(CustomUser, id=int(user_id))
         user = self.request.user
-        try:
-            follow = get_object_or_404(Follow, user=user, following=following)
-        except Follow.DoesNotExist:
-            return Response({'detail': 'The follow object does not exist.'},
-                            status=status.HTTP_404_NOT_FOUND)
+        follow = get_object_or_404(Follow, user=user, following=following)
         follow.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -64,11 +64,7 @@ class FavoriteViewSet(viewsets.ModelViewSet):
     def destroy(self, request, recipe_id):
         favorite = get_object_or_404(Recipe, id=int(recipe_id))
         user = self.request.user
-        try:
-            favor = get_object_or_404(Favorite, user=user, favorite=favorite)
-        except Favorite.DoesNotExist:
-            return Response({'detail': 'The favorite object does not exist.'},
-                            status=status.HTTP_404_NOT_FOUND)
+        favor = get_object_or_404(Favorite, user=user, favorite=favorite)
         favor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -87,13 +83,8 @@ class ShoppingCartViewSet(viewsets.ModelViewSet):
     def destroy(self, request, recipe_id):
         recipe = get_object_or_404(Recipe, id=int(recipe_id))
         user = self.request.user
-        try:
-            recipe_in_cart = get_object_or_404(ShoppingCart, user=user,
-                                               recipe=recipe)
-        except Favorite.DoesNotExist:
-            return Response(
-                {'detail': 'The ShoppingCart object does not exist.'},
-                status=status.HTTP_404_NOT_FOUND)
+        recipe_in_cart = get_object_or_404(ShoppingCart, user=user,
+                                           recipe=recipe)
         recipe_in_cart.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -114,15 +105,15 @@ class DownloadShoppingCartView(APIView):
                 amount = ingredient_in_recipe.amount
                 measurement_unit = ingredient.measurement_unit
 
-                ingredient_line = (f"{ingredient.name} ({amount} "
-                                   f"{measurement_unit})")
+                ingredient_line = (f'{ingredient.name} ({amount} '
+                                   f'{measurement_unit})')
 
                 ingredients_summary[ingredient_line] += float(amount)
 
-        content = "Список покупок:\n\n"
+        content = 'Список покупок:\n\n'
 
         for ingredient_line, amount in ingredients_summary.items():
-            content += f"{ingredient_line} — {amount} г\n"
+            content += f'{ingredient_line} — {amount} г\n'
 
         response = HttpResponse(content, content_type='text/plain')
         response['Content-Disposition'] = ('attachment; '

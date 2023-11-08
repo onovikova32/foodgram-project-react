@@ -8,6 +8,11 @@ from users.serializers import CustomUserSerializer
 from .models import (Recipe, IngredientInRecipe, Ingredient,
                      Tag, Favorite, ShoppingCart)
 
+MIN_AMOUNT = 1
+MAX_AMOUNT = 32000
+MAX_COOKING_TIME = 32000
+MIN_COOKING_TIME = 1
+
 
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
@@ -45,9 +50,6 @@ class IngredientInRecipeSerializer(serializers.ModelSerializer):
 
 
 class AddIngredientSerializer(serializers.ModelSerializer):
-    MIN_AMOUNT = 1
-    MAX_AMOUNT = 32000
-
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     amount = serializers.IntegerField(
         min_value=MIN_AMOUNT,
@@ -64,9 +66,6 @@ class AddIngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    MAX_COOKING_TIME = 32000
-    MIN_COOKING_TIME = 1
-
     tags = serializers.PrimaryKeyRelatedField(queryset=Tag.objects.all(),
                                               many=True)
     ingredients = AddIngredientSerializer(many=True,
